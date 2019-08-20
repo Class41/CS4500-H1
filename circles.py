@@ -18,7 +18,7 @@ class Circle:
     def getRandomArrow(self):
         return self.arrows[random.randint(0, len(self.arrows))]
 
-    def addToArrowArary(self, circleObj):
+    def addToArrowArray(self, circleObj):
         self.arrows.append(circleObj)
 
 
@@ -53,6 +53,13 @@ def main():
             arrowSpec = fileIn.readline().split(' ')
             if arrowSpec is None or len(arrowSpec) < 2:
                 raise Exception("Not enough valid lines in input file. Expected " + str((numArrows + 2)))
+            else:
+                if(int(arrowSpec[0]) < 1 or int(arrowSpec[1]) < 1 or int(arrowSpec[0]) > numCircles or int(arrowSpec[1]) > numCircles):
+                    raise Exception("Expected arrow start and end positions to be in range of 1 to " + str(numCircles))
+                else:
+                    for x in circles:
+                        print(str(x))
+                    #circles[int(arrowSpec[0]) - 1].addToArrowArray(circles[int(arrowSpec[1]) - 1])
     except Exception as e:
         print("Something went wrong! (Stopped on input line #" +
               str((iterator + 3)) + "): " + str(e))
