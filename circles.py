@@ -20,7 +20,13 @@ class Circle:
 
     def addToArrowArray(self, circleObj):
         self.arrows.append(circleObj)
+    
+    def getArrows(self):
+        return self.arrows
 
+def convertFromArray(x):
+    x += 1
+    return str(x) + " "
 
 def main():
     fileIn = open("HW1infile.txt")
@@ -44,7 +50,7 @@ def main():
 
     circles = []
 
-    for x in range(0, numCircles - 1):
+    for x in range(0, numCircles):
         circles.append(Circle(False, []))
 
     iterator = 0
@@ -57,13 +63,13 @@ def main():
                 if(int(arrowSpec[0]) < 1 or int(arrowSpec[1]) < 1 or int(arrowSpec[0]) > numCircles or int(arrowSpec[1]) > numCircles):
                     raise Exception("Expected arrow start and end positions to be in range of 1 to " + str(numCircles))
                 else:
-                    for x in circles:
-                        print(str(x))
-                    #circles[int(arrowSpec[0]) - 1].addToArrowArray(circles[int(arrowSpec[1]) - 1])
+                    circles[int(arrowSpec[0]) - 1].addToArrowArray(int(arrowSpec[1]) - 1)
     except Exception as e:
         print("Something went wrong! (Stopped on input line #" +
               str((iterator + 3)) + "): " + str(e))
-
+    
+    for pos in range(0, len(circles)):
+        print(str(pos + 1) + " is pointing to => " + "".join(map(convertFromArray, circles[pos].getArrows())))
 
 if __name__ == "__main__":
     main()
