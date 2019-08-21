@@ -2,31 +2,103 @@
 # Project: Homework 1
 # Purpose: Implement circles and arrows game
 # Started: 8.20.19
-# Completed:
+# Completed: 8.20.19
 import random
 import sys
 
-
 class Circle:
-    def __init__(self, checkedStatus, arrows):
-        self.checkedStatus = checkedStatus
+    def __init__(self, checkedCount, arrows):
+        self.checkedCount = checkedCount
         self.arrows = arrows
 
     def getCheckedStatus(self):
-        return self.checkedStatus
+        return self.checkedCount
 
     def getRandomArrow(self):
-        return self.arrows[random.randint(0, len(self.arrows))]
+        return self.arrows[random.randint(0, len(self.arrows) - 1)]
 
     def addToArrowArray(self, circleObj):
         self.arrows.append(circleObj)
     
     def getArrows(self):
         return self.arrows
+    
+    def getCheckCount(self):
+        return self.checkedCount
+    
+    def setVisited(self):
+        self.checkedCount += 1
 
 def convertFromArray(x):
     x += 1
     return str(x) + " "
+
+def getArrows(fileIn, numCircles, numArrows):
+    circles = []
+    for x in range(0, numCircles):
+        circles.append(Circle(0, []))
+
+    iterator = 0
+    try:
+        for iterator in range(0, numArrows):
+            arrowSpec = fileIn.readline().split(' ')
+            if arrowSpec is None or len(arrowSpec) < 2:
+                raise Exception("Not enough valid lines in input file. Expected " + str((numArrows + 2)))
+            else:
+                if(int(arrowSpec[0]) < 1 or int(arrowSpec[1]) < 1 or int(arrowSpec[0]) > numCircles or int(arrowSpec[1]) > numCircles):
+                    raise Exception("Expected arrow start and end positions to be in range of 1 to " + str(numCircles))
+                else:
+                    circles[int(arrowSpec[0]) - 1].addToArrowArray(int(arrowSpec[1]) - 1)
+    except Exception as e:
+        print("Something went wrong! (Stopped on input line #" +
+              str((iterator + 3)) + "): " + str(e))
+        return None
+
+    return circles
+
+def playTheGame(circles, numCircles, numArrows):
+    currentCircle = random.randint(0, numCircles - 1)
+    circles[currentCircle].setVisited()
+    allNodesHit = False
+
+    print("Beginning graph traversal")
+    while allNodesHit != True:
+        newVisitingCircle = circles[currentCircle].getRandomArrow()
+        print("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1))
+        currentCircle = newVisitingCircle
+        circles[currentCircle].setVisited()
+        allNodesHit = True
+
+        for circle in circles:
+            if circle.checkedCount == 0:
+                allNodesHit = False
+                break
+    
+    outputFile = open("HW1OnufriyevOutfile.txt", "w")
+    outputFile.write("Number of circles used for the game is: " + str(numCircles))
+    outputFile.write("\nNumber of arrows user for this game is: " + str(numArrows))
+
+    print("Number of circles used for the game is: " + str(numCircles))
+    print("Number of arrows user for this game is: " + str(numArrows))
+
+    totalChecks = 0;
+    maxChecks = 0
+
+    for circle in circles:
+        totalChecks += circle.getCheckCount()
+        if circle.getCheckCount() > maxChecks:
+            maxChecks = circle.getCheckCount()
+
+    outputFile.write("\nTotal number of circles visited is: " + str(totalChecks))
+    outputFile.write("\nAverage number of circle hits: " + str(float(totalChecks) / float(numCircles)))
+    outputFile.write("\nMax number of circle hits: " + str(maxChecks))
+
+    print("Total number of circles visited is: " + str(totalChecks))
+    print("Average number of circle hits: " + str(float(totalChecks) / float(numCircles)))
+    print("Max number of circle hits: " + str(maxChecks))
+
+
+
 
 def main():
     fileIn = open("HW1infile.txt")
@@ -48,28 +120,15 @@ def main():
         print("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
         return
 
-    circles = []
+    circles = getArrows(fileIn, numCircles, numArrows)
 
-    for x in range(0, numCircles):
-        circles.append(Circle(False, []))
+    if circles == None:
+        return
 
-    iterator = 0
-    try:
-        for iterator in range(0, numArrows):
-            arrowSpec = fileIn.readline().split(' ')
-            if arrowSpec is None or len(arrowSpec) < 2:
-                raise Exception("Not enough valid lines in input file. Expected " + str((numArrows + 2)))
-            else:
-                if(int(arrowSpec[0]) < 1 or int(arrowSpec[1]) < 1 or int(arrowSpec[0]) > numCircles or int(arrowSpec[1]) > numCircles):
-                    raise Exception("Expected arrow start and end positions to be in range of 1 to " + str(numCircles))
-                else:
-                    circles[int(arrowSpec[0]) - 1].addToArrowArray(int(arrowSpec[1]) - 1)
-    except Exception as e:
-        print("Something went wrong! (Stopped on input line #" +
-              str((iterator + 3)) + "): " + str(e))
-    
     for pos in range(0, len(circles)):
         print(str(pos + 1) + " is pointing to => " + "".join(map(convertFromArray, circles[pos].getArrows())))
+
+    playTheGame(circles, numCircles, numArrows)
 
 if __name__ == "__main__":
     main()
