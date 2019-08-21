@@ -34,6 +34,8 @@
     It is assumed that data that will be provided will be a strongly connected graph
     and a circuit can be completed on the graph.
 
+    Circles are numbered from 1 to n
+
     ** Rules **
     The arrows game consists of a simple ruleset:
     1.  Start at a random point in the graph and place a "marker"
@@ -73,6 +75,16 @@
 import random
 import sys
 
+"""
+# Class: Circle
+# Purpose: The Circle class functions as a datastrcuture for information in this project
+           Circle stores the check count on the node, and also the arrows that are going
+           out of the circle and their destinations. Helper functions inside the class
+           assist in getting the data out and modifying the private variables.
+
+           For the purpose of this project, it takes in just standard 0 and empty array as
+           parameters, but I designed this to be future-proof in case of expansion
+"""
 class Circle:
     def __init__(self, checkedCount, arrows):
         self.checkedCount = checkedCount
@@ -96,10 +108,25 @@ class Circle:
     def setVisited(self):
         self.checkedCount += 1
 
+"""
+# Function: convertFromArray
+# Purpose: Used during the mapping proccess of data to convert array notation back to
+           expected humanly-readable notation and insert spaces to seperate output
+           on the console
+"""
 def convertFromArray(x):
     x += 1
     return str(x) + " "
 
+"""
+# Function: getArrows
+# Purpose: Given the input file, the circle count, and arrow count, generates a set
+           of Circle objects in a list form that contains their attributes and interactions
+           with the other circle objects. For example, the circle at position 0 would store
+           data for input data file data that mentions "Circle 1", and that Circle 1 has a 
+           arrow pointing to circles 3,4,5. This Circle is now stored in the array at position
+           0.
+"""
 def getArrows(fileIn, numCircles, numArrows):
     circles = []
     for x in range(0, numCircles):
@@ -123,6 +150,12 @@ def getArrows(fileIn, numCircles, numArrows):
 
     return circles
 
+"""
+# Function: playTheGame
+# Purpose: Given a set of circles, the number of circles and arrows, selects a random circle to start at
+           then proceeds to select a random connection off the starting node continues randomly selecting
+           arrows and checking if all node are visited until all nodes are visited at least once
+"""
 def playTheGame(circles, numCircles, numArrows):
     currentCircle = random.randint(0, numCircles - 1) #I know you said "in circle 1" in the assingment, 
                                                       #but I assumed that was randomly chosen out of the 3 possible
@@ -141,7 +174,10 @@ def playTheGame(circles, numCircles, numArrows):
             if circle.checkedCount == 0:
                 allNodesHit = False
                 break
+                
+    outputResults(circles, numCircles, numArrows)
     
+def outputResults(circles, numCircles, numArrows):
     outputFile = open("HW1OnufriyevOutfile.txt", "w")
     outputFile.write("Number of circles used for the game is: " + str(numCircles))
     outputFile.write("\nNumber of arrows user for this game is: " + str(numArrows))
@@ -164,8 +200,6 @@ def playTheGame(circles, numCircles, numArrows):
     print("Total number of circles visited is: " + str(totalChecks))
     print("Average number of circle hits: " + str(float(totalChecks) / float(numCircles)))
     print("Max number of circle hits: " + str(maxChecks))
-
-
 
 
 def main():
