@@ -1,8 +1,75 @@
+""" 
 # Author: Vasyl Onufriyev
 # Project: Homework 1
 # Purpose: Implement circles and arrows game
 # Started: 8.20.19
 # Completed: 8.20.19
+
+* Game Rules *
+
+    ** Input **
+    The input file is called HW1infile.txt, inputs are as follows:
+    Line 1:         # of circles to be employed during the game
+    Line 2:         # of edges or "arrows" to be used between the circles
+    Line 3 - n:     Arrows denoted as start-end positions
+
+    Example input file:
+    5
+    10
+    1 2
+    2 3
+    3 4
+    4 5
+    5 2
+    3 1
+    1 3
+    3 3
+    1 4
+    5 3
+
+    ** Assumptions **
+    The number of arrows is equal to n where n is the number of circles,
+    or in other words the number on the first line of the input file.
+
+    It is assumed that data that will be provided will be a strongly connected graph
+    and a circuit can be completed on the graph.
+
+    ** Rules **
+    The arrows game consists of a simple ruleset:
+    1.  Start at a random point in the graph and place a "marker"
+    2.  Choose a random path from the current node or "circle" in the 
+        graph and proceed to any connected
+    3.  Move the "current marker" location to the newly traversed node
+    4.  Repeat steps 2 & 3 until all nodes in the graph have been visited
+
+* Program Structure Explained *
+    ** Possible Bugs **
+    If any bugs are encountered, they are most likely linked to the input file
+    not having content on lines but are just left empty. Input file should only 
+    contain lines with content. EOF checking is used to determine input set
+
+    ** Data Structures **
+    The primary data structure of this program is called "Circle" and is defined as a class.
+    On init, it expects a checked counter and a vector of arrows which are simply integers
+    to other Circle objects in a larger Circle list. Some functionality was added and was
+    intentionally not used simply for future assignment compatibility.
+
+    ** External Files **
+    The input file for this project is Hw1infile.txt, the details of what should be in that 
+    file are explained above.
+
+    The output file of this program is called HW1OnufriyevOutfile.txt and will contain the 
+    top several lines of the input file, I.E the number of circles and arrows in play within
+    the game and analytical data such as the total number of circles visited, average number 
+    of checks in a circle throughout the game, and the max number of checks 
+
+    ** Assumtions For Calculations **
+    I assume that the circle that you begin the game on should be included for the calculations
+    for how many circles were visited throughout the game and is marked as checked the moment 
+    the game begins.
+
+"""
+
 import random
 import sys
 
@@ -57,7 +124,8 @@ def getArrows(fileIn, numCircles, numArrows):
     return circles
 
 def playTheGame(circles, numCircles, numArrows):
-    currentCircle = random.randint(0, numCircles - 1)
+    currentCircle = random.randint(0, numCircles - 1) #I know you said "in circle 1" in the assingment, 
+                                                      #but I assumed that was randomly chosen out of the 3 possible
     circles[currentCircle].setVisited()
     allNodesHit = False
 
@@ -116,7 +184,7 @@ def main():
         print("You must have at least one circle.")
         return
 
-    if numArrows < (numCircles * (numCircles - 1)) / 2 or type(numCircles) != int:
+    if numArrows < numCircles or type(numCircles) != int:
         print("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
         return
 
