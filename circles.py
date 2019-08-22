@@ -195,25 +195,29 @@ def playTheGame(circles, numCircles, numArrows, outputFile):
 # Function: outputResults
 # Purpose: Gets called by the playTheGame function and displays the result of the game
 """
-def outputResults(circles, numCircles, numArrows, outputFile):
+def outputResults(circles, numCircles, numArrows, outputFile):    
+    #file output version
     outputFile.write("Number of circles used for the game is: " + str(numCircles))
     outputFile.write("\nNumber of arrows user for this game is: " + str(numArrows))
-
+    
+    #console output version
     print("Number of circles used for the game is: " + str(numCircles))
     print("Number of arrows user for this game is: " + str(numArrows))
 
     totalChecks = 0
     maxChecks = 0
 
-    for circle in circles:
-        totalChecks += circle.getCheckCount()
-        if circle.getCheckCount() > maxChecks:
-            maxChecks = circle.getCheckCount()
+    for circle in circles: #for each circle in the circle array
+        totalChecks += circle.getCheckCount() #add this circle's hitcount to the total
+        if circle.getCheckCount() > maxChecks: #if this circle has more hits than the last max
+            maxChecks = circle.getCheckCount() #this is now the new max
 
+    #file output
     outputFile.write("\nTotal number of circles visited is: " + str(totalChecks))
-    outputFile.write("\nAverage number of circle hits: " + str(float(totalChecks) / float(numCircles)))
+    outputFile.write("\nAverage number of circle hits: " + str(float(totalChecks) / float(numCircles))) #total checks divided by total circles = #checks/circles avg
     outputFile.write("\nMax number of circle hits: " + str(maxChecks))
 
+    #console output
     print("Total number of circles visited is: " + str(totalChecks))
     print("Average number of circle hits: " + str(float(totalChecks) / float(numCircles)))
     print("Max number of circle hits: " + str(maxChecks))
