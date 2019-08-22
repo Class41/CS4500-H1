@@ -38,7 +38,7 @@
 
     ** Rules **
     The arrows game consists of a simple ruleset:
-    1.  Start at a random point in the graph and place a "marker"
+    1.  Start at a 1st circle in the graph and place a "marker"
     2.  Choose a random path from the current node or "circle" in the 
         graph and proceed to any connected
     3.  Move the "current marker" location to the newly traversed node
@@ -72,7 +72,7 @@
 
 """
 
-import random
+import secrets
 import sys
 
 """
@@ -95,7 +95,8 @@ class Circle:
         return self.checkedCount
 
     def getRandomArrow(self):
-        return self.arrows[random.randint(0, len(self.arrows) - 1)] #select a random defined arrow and return
+        return self.arrows[secrets.randbelow(len(self.arrows)) - 1] #select a random defined arrow and return.
+                                                                    #uses CRYPTOGRAPHICALLY SECURE library
 
     def addToArrowArray(self, circleObj):
         self.arrows.append(circleObj)
@@ -109,6 +110,7 @@ class Circle:
     def setVisited(self):
         self.checkedCount += 1
 
+
 """
 # Function: convertFromArray
 # Purpose: Used during the mapping proccess of data to convert array notation back to
@@ -118,6 +120,7 @@ class Circle:
 def convertFromArray(x):
     x += 1
     return str(x) + " "
+
 
 """
 # Function: getArrows
@@ -137,7 +140,7 @@ def getArrows(fileIn, numCircles, numArrows):
     try:
         for iterator in range(0, numArrows): #for every line after the first two
             arrowSpec = fileIn.readline().split(' ') #break down the input in X X format
-            if arrowSpec is None or len(arrowSpec) < 2: #if there is no input or less than expected input
+            if arrowSpec is None or len(arrowSpec) < 2 or len(arrowSpec) > 2: #if there is no input or less than expected input or more
                 raise Exception("Not enough valid lines in input file. Expected " + str((numArrows + 2))) #complain
             else: #this is called if the proper number of inputs have been found
                 if(int(arrowSpec[0]) < 1 or int(arrowSpec[1]) < 1 or
@@ -159,15 +162,15 @@ def getArrows(fileIn, numCircles, numArrows):
 
     return circles
 
+
 """
 # Function: playTheGame
-# Purpose: Given a set of circles, the number of circles and arrows, selects a random circle to start at
+# Purpose: Given a set of circles, the number of circles and arrows, selects the first circle to start at
            then proceeds to select a random connection off the starting node continues randomly selecting
            arrows and checking if all node are visited until all nodes are visited at least once
 """
-def playTheGame(circles, numCircles, numArrows):
-    currentCircle = random.randint(0, numCircles - 1) #I know you said "in circle 1" in the assingment, 
-                                                      #but I assumed that was randomly chosen out of the 3 possible
+def playTheGame(circles, numCircles, numArrows, outputFile):
+    currentCircle = 0; #start at circle #1
     circles[currentCircle].setVisited() #set the starting node as visited
     allNodesHit = False
 
@@ -175,6 +178,7 @@ def playTheGame(circles, numCircles, numArrows):
     while allNodesHit != True: #while nodes are still unvisited
         newVisitingCircle = circles[currentCircle].getRandomArrow()
         print("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1))
+        outputFile.write("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1) + "\n")
         currentCircle = newVisitingCircle
         circles[currentCircle].setVisited()
         allNodesHit = True
@@ -184,21 +188,21 @@ def playTheGame(circles, numCircles, numArrows):
                 allNodesHit = False
                 break #since there is a unvisited node, we don't care about the rest. We're looping again anyways
 
-    outputResults(circles, numCircles, numArrows)
+    outputResults(circles, numCircles, numArrows, outputFile)
+
 
 """
 # Function: outputResults
 # Purpose: Gets called by the playTheGame function and displays the result of the game
 """
-def outputResults(circles, numCircles, numArrows):
-    outputFile = open("HW1OnufriyevOutfile.txt", "w")
+def outputResults(circles, numCircles, numArrows, outputFile):
     outputFile.write("Number of circles used for the game is: " + str(numCircles))
     outputFile.write("\nNumber of arrows user for this game is: " + str(numArrows))
 
     print("Number of circles used for the game is: " + str(numCircles))
     print("Number of arrows user for this game is: " + str(numArrows))
 
-    totalChecks = 0;
+    totalChecks = 0
     maxChecks = 0
 
     for circle in circles:
@@ -214,6 +218,7 @@ def outputResults(circles, numCircles, numArrows):
     print("Average number of circle hits: " + str(float(totalChecks) / float(numCircles)))
     print("Max number of circle hits: " + str(maxChecks))
 
+
 """
 # Function: main
 # Purpose: Does main stuff like booting up the project, getting the input file and reading in
@@ -221,34 +226,48 @@ def outputResults(circles, numCircles, numArrows):
            generator which returns a circle data set which is then passed into the play function
 """
 def main():
-    fileIn = open("HW1infile.txt")
+    outputFile = None
+    fileIn = None
+    try: #attempts to open the output and input files in that order. In case input fails, we want to have output open
+        outputFile = open("HW1OnufriyevOutfile.txt", "w")
+        fileIn = open("HW1infile.txt")
+    except Exception as e:
+        print("There was a problem loading a file => " + str(e))
+        outputFile.write("There was a problem loading a file => " + str(e))
+        return
+
     try:
         numCircles = int(fileIn.readline()) #typecasting can fail in the case that a letter or array is input
         numArrows = int(fileIn.readline())
     except:
         print("Something is wrong with the input...please check and try again.")
+        outputFile.write("Something is wrong with the input...please check and try again.")
         return
 
     print("Number of circles read: " + str(numCircles))
     print("Number of arrows read: " + str(numArrows))
 
-    if numCircles == 0 or type(numCircles) != int: #cant play if circle count is 0
-        print("You must have at least one circle.")
+    if numCircles < 2 or numCircles > 10 or type(numCircles) != int: #cant play if circle count is 0
+        print("You must have at 2 circles and a max of 10.")
+        outputFile.write("You must have at 2 circles and a max of 10.")
         return
 
     if numArrows < numCircles or type(numCircles) != int: #n is the minimum number of arrows to play and be valid
         print("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
+        outputFile.write("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
         return
 
-    circles = getArrows(fileIn, numCircles, numArrows)
+    circles = getArrows(fileIn, numCircles, numArrows) #generates arrows and returns the array of circles
 
-    if circles == None:
+    if circles == None: #in case something went wrong
         return
 
     for pos in range(0, len(circles)): #outputs the current setup
         print(str(pos + 1) + " is pointing to => " + "".join(map(convertFromArray, circles[pos].getArrows())))
+        outputFile.write(str(pos + 1) + " is pointing to => " + "".join(map(convertFromArray, circles[pos].getArrows())) + "\n")
 
-    playTheGame(circles, numCircles, numArrows)
+    playTheGame(circles, numCircles, numArrows, outputFile)
+
 
 if __name__ == "__main__":
     main()
