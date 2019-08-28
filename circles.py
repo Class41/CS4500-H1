@@ -74,6 +74,7 @@
 
 import secrets
 import sys
+import math
 
 """
 # Class: Circle
@@ -347,6 +348,7 @@ def main():
     if circles == None: #in case something went wrong
         return
 
+    sys.setswitchinterval(math.pow(numCircles * 20, numCircles) + 1) #sets recusion limit so python doesn't bork itself
     if verifyConnectivity(circles) != 1:
         print("Not a connected graph! Please check your input and try again.")
         outputFile.write("Not a connected graph! Please check your input and try again.")
