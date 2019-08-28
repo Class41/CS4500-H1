@@ -72,9 +72,11 @@
 
 """
 
+
 import secrets
 import sys
 import math
+
 
 """
 # Class: Circle
@@ -86,6 +88,8 @@ import math
            For the purpose of this project, it takes in just standard 0 and empty array as
            parameters, but I designed this to be future-proof in case of expansion
 """
+
+
 class Circle:
     def __init__(self, checkedCount, arrows):
         self.checkedCount = checkedCount #running counter of visits
@@ -128,6 +132,8 @@ class Circle:
            expected humanly-readable notation and insert spaces to seperate output
            on the console
 """
+
+
 def convertFromArray(x):
     x += 1
     return str(x) + " "
@@ -142,6 +148,8 @@ def convertFromArray(x):
            arrow pointing to circles 3,4,5. This Circle is now stored in the array at position
            0.
 """
+
+
 def getArrows(fileIn, outputFile, numCircles, numArrows):
     circles = []
     for x in range(0, numCircles): #creates a cicle object for each circle in play
@@ -243,12 +251,15 @@ def clearFlags(circles):
     for circle in circles: #for each circle, remove the flag if any
         circle.clearFlag()
 
+
 """
 # Function: playTheGame
 # Purpose: Given a set of circles, the number of circles and arrows, selects the first circle to start at
            then proceeds to select a random connection off the starting node continues randomly selecting
            arrows and checking if all node are visited until all nodes are visited at least once
 """
+
+
 def playTheGame(circles, numCircles, numArrows, outputFile):
     currentCircle = 0; #start at circle #1
     circles[currentCircle].setVisited() #set the starting node as visited
@@ -277,6 +288,8 @@ def playTheGame(circles, numCircles, numArrows, outputFile):
 # Function: outputResults
 # Purpose: Gets called by the playTheGame function and displays the result of the game
 """
+
+
 def outputResults(circles, numCircles, numArrows, outputFile):    
     #file output version
     outputFile.write("Number of circles used for the game is: " + str(numCircles))
@@ -311,6 +324,8 @@ def outputResults(circles, numCircles, numArrows, outputFile):
            the top two lines (circle and arrow count) then passing the data along to the circle
            generator which returns a circle data set which is then passed into the play function
 """
+
+
 def main():
     outputFile = None
     fileIn = None
@@ -348,7 +363,7 @@ def main():
     if circles == None: #in case something went wrong
         return
 
-    sys.setswitchinterval(math.pow(numCircles * 20, numCircles) + 1) #sets recusion limit so python doesn't bork itself
+    sys.setrecursionlimit(2147483647) #sets recusion limit so python doesn't bork itself
     if verifyConnectivity(circles) != 1:
         print("Not a connected graph! Please check your input and try again.")
         outputFile.write("Not a connected graph! Please check your input and try again.")

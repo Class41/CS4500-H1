@@ -1,5 +1,13 @@
 Traversing 1 => 2
 Traversing 2 => 1
+Traversing 1 => 2
+Traversing 2 => 1
+Traversing 1 => 2
+Traversing 2 => 1
+Traversing 1 => 2
+Traversing 2 => 1
+Traversing 1 => 2
+Traversing 2 => 1
 Traversing 1 => 3
 Traversing 3 => 2
 Traversing 2 => 1
@@ -9,6 +17,6 @@ Traversing 1 => 3
 Traversing 3 => 4
 Number of circles used for the game is: 4
 Number of arrows user for this game is: 7
-Total number of circles visited is: 10
-Average number of circle hits: 2.5
-Max number of circle hits: 4
+Total number of circles visited is: 18
+Average number of circle hits: 4.5
+Max number of circle hits: 8
