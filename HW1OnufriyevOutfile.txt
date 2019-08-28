@@ -1,1 +1,22 @@
-Something went wrong! (Stopped on input line #10): Expected arrow start and end positions to be in range of 1 to 5
+Traversing 1 => 4
+Traversing 4 => 1
+Traversing 1 => 3
+Traversing 3 => 1
+Traversing 1 => 4
+Traversing 4 => 1
+Traversing 1 => 4
+Traversing 4 => 1
+Traversing 1 => 3
+Traversing 3 => 1
+Traversing 1 => 3
+Traversing 3 => 1
+Traversing 1 => 4
+Traversing 4 => 1
+Traversing 1 => 4
+Traversing 4 => 1
+Traversing 1 => 2
+Number of circles used for the game is: 4
+Number of arrows user for this game is: 6
+Total number of circles visited is: 18
+Average number of circle hits: 4.5
+Max number of circle hits: 9

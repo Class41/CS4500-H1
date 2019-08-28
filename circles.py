@@ -90,6 +90,7 @@ class Circle:
         self.checkedCount = checkedCount #running counter of visits
         self.arrows = arrows #arrows are a set of integers which correspond to the index of the
                              #Circles array which are mentioned below in the other functions
+        self.isFlagged = False
 
     def getCheckedStatus(self):
         return self.checkedCount
@@ -109,6 +110,15 @@ class Circle:
     
     def setVisited(self):
         self.checkedCount += 1
+
+    def flagMe(self):
+        self.isFlagged = True
+    
+    def clearFlag(self):
+        self.isFlagged = False
+
+    def getFlag(self):
+        return self.isFlagged
 
 
 """
@@ -159,11 +169,80 @@ def getArrows(fileIn, outputFile, numCircles, numArrows):
         print("Something went wrong! (Stopped on input line #" +
               str((iterator + 3)) + "): " + str(e)) #display detailed debug output in case there is a problem
         outputFile.write("Something went wrong! (Stopped on input line #" +
-              str((iterator + 3)) + "): " + str(e));
+              str((iterator + 3)) + "): " + str(e))
         return None
 
     return circles
 
+
+"""
+# Function: verifyConnectivity
+# Purpose: Given the input circle array, check if each circle can get to every other circle
+           using some combination of traversing between cicles 1-n. This specific function handles
+           checking that all circles at least have one in/out and then kickstarts the recursion
+           function. The 0 arrow test is there to short circuit the test.
+"""
+
+
+def verifyConnectivity(circles):
+    for circle in circles: #for each circle, does each one have at LEAST one output arrow?
+        if len(circle.getArrows()) == 0:
+            return 0 #if not, then the graph can't be connected
+
+    for circle in circles: #for each circle
+        flagEverythingConnected(circles, circle) #flag all accessable circles
+        if validateFlags(circles) == -1: #are there any unflagged circles?
+            return -1 #then we aren't connected
+        clearFlags(circles) #clear the flags for the next initilazation circle
+
+    return 1
+
+
+"""
+# Function: flagEverythingConnected
+# Purpose: Given the circle array and a specific circle, flag the current circle we are in
+           then find a connected circle that has yet to be flagged. Once one has been found,
+           go visit that one recursively. Then once that path has been explored, and recursion
+           unwinds, we return back to the spot where we found the unflagged circle. We then check
+           the next circle in our arrows list that hasn't been flagged yet and flag that etc.
+"""
+
+
+def flagEverythingConnected(circles, circle):
+    circle.flagMe() #flag me
+
+    for targetCircle in circle.getArrows(): #for every circle I am connected to
+        if circles[targetCircle].getFlag() == False: #is the connected circle flagged? If not
+            flagEverythingConnected(circles, circles[targetCircle]) #let's flag it and have it do the same
+
+
+"""
+# Function: validateFlags
+# Purpose: Ran normally after flagEverythingConnected(). Verifies that from the start circle, as detailed
+           in verifyConnectivity(), that we reached all other circles in the graph. If not, we return a 
+           failure result.
+"""
+
+
+def validateFlags(circles):
+    for circle in circles:
+        if circle.getFlag() == False:
+            for circle in circles:
+                print(circle.getFlag())
+            return -1
+    return 1
+
+
+"""
+# Function: clearFlags
+# Purpose: After we have validated the flags using validateFlags(), we now need to clear them so the next
+           round doesn't get confused. For each circle, clear the flag!
+"""
+
+
+def clearFlags(circles):
+    for circle in circles: #for each circle, remove the flag if any
+        circle.clearFlag()
 
 """
 # Function: playTheGame
@@ -176,13 +255,13 @@ def playTheGame(circles, numCircles, numArrows, outputFile):
     circles[currentCircle].setVisited() #set the starting node as visited
     allNodesHit = False
 
-    #print("Beginning graph traversal")
+    print("Beginning graph traversal")
     while allNodesHit != True: #while nodes are still unvisited
         newVisitingCircle = circles[currentCircle].getRandomArrow()
-        """
+        
         print("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1))
         outputFile.write("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1) + "\n")
-        """
+        
         currentCircle = newVisitingCircle
         circles[currentCircle].setVisited()
         allNodesHit = True
@@ -252,8 +331,8 @@ def main():
         outputFile.write("Something is wrong with the input...please check and try again.")
         return
 
-    #print("Number of circles read: " + str(numCircles))
-    #print("Number of arrows read: " + str(numArrows))
+    print("Number of circles read: " + str(numCircles))
+    print("Number of arrows read: " + str(numArrows))
 
     if numCircles < 2 or numCircles > 10 or type(numCircles) != int: #cant play if circle count is 0
         print("You must have at 2 circles and a max of 10.")
@@ -268,6 +347,11 @@ def main():
     circles = getArrows(fileIn, outputFile, numCircles, numArrows) #generates arrows and returns the array of circles
 
     if circles == None: #in case something went wrong
+        return
+
+    if verifyConnectivity(circles) != 1:
+        print("Not a connected graph! Please check your input and try again.")
+        outputFile.write("Not a connected graph! Please check your input and try again.")
         return
 
     playTheGame(circles, numCircles, numArrows, outputFile)
