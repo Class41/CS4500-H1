@@ -99,25 +99,25 @@ class Circle:
         return self.arrows[secrets.randbelow(len(self.arrows)) - 1] #select a random defined arrow and return.
                                                                     #uses CRYPTOGRAPHICALLY SECURE library
 
-    def addToArrowArray(self, circleObj):
+    def addToArrowArray(self, circleObj): #adds a given circle to the array
         self.arrows.append(circleObj)
     
-    def getArrows(self):
+    def getArrows(self): #gets the arrow int array
         return self.arrows
     
-    def getCheckCount(self):
+    def getCheckCount(self): #gets how many times this circle was visited
         return self.checkedCount
     
-    def setVisited(self):
+    def setVisited(self): #sets that this circle was visited
         self.checkedCount += 1
 
-    def flagMe(self):
+    def flagMe(self): #sets a flag on this circle. used for path validation
         self.isFlagged = True
     
-    def clearFlag(self):
+    def clearFlag(self): #clears flag see flagMe()
         self.isFlagged = False
 
-    def getFlag(self):
+    def getFlag(self): #gets flag see flagMe()
         return self.isFlagged
 
 
@@ -225,11 +225,9 @@ def flagEverythingConnected(circles, circle):
 
 
 def validateFlags(circles):
-    for circle in circles:
-        if circle.getFlag() == False:
-            for circle in circles:
-                print(circle.getFlag())
-            return -1
+    for circle in circles: #for each circle
+        if circle.getFlag() == False: #if there is a circle that hasn't been visited
+            return -1 #that means that there is a circle that is inaccessable
     return 1
 
 
