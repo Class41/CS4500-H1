@@ -131,7 +131,7 @@ def convertFromArray(x):
            arrow pointing to circles 3,4,5. This Circle is now stored in the array at position
            0.
 """
-def getArrows(fileIn, numCircles, numArrows):
+def getArrows(fileIn, outputFile, numCircles, numArrows):
     circles = []
     for x in range(0, numCircles): #creates a cicle object for each circle in play
         circles.append(Circle(0, []))
@@ -158,6 +158,8 @@ def getArrows(fileIn, numCircles, numArrows):
     except Exception as e:
         print("Something went wrong! (Stopped on input line #" +
               str((iterator + 3)) + "): " + str(e)) #display detailed debug output in case there is a problem
+        outputFile.write("Something went wrong! (Stopped on input line #" +
+              str((iterator + 3)) + "): " + str(e));
         return None
 
     return circles
@@ -174,11 +176,13 @@ def playTheGame(circles, numCircles, numArrows, outputFile):
     circles[currentCircle].setVisited() #set the starting node as visited
     allNodesHit = False
 
-    print("Beginning graph traversal")
+    #print("Beginning graph traversal")
     while allNodesHit != True: #while nodes are still unvisited
         newVisitingCircle = circles[currentCircle].getRandomArrow()
+        """
         print("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1))
         outputFile.write("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1) + "\n")
+        """
         currentCircle = newVisitingCircle
         circles[currentCircle].setVisited()
         allNodesHit = True
@@ -248,8 +252,8 @@ def main():
         outputFile.write("Something is wrong with the input...please check and try again.")
         return
 
-    print("Number of circles read: " + str(numCircles))
-    print("Number of arrows read: " + str(numArrows))
+    #print("Number of circles read: " + str(numCircles))
+    #print("Number of arrows read: " + str(numArrows))
 
     if numCircles < 2 or numCircles > 10 or type(numCircles) != int: #cant play if circle count is 0
         print("You must have at 2 circles and a max of 10.")
@@ -261,14 +265,10 @@ def main():
         outputFile.write("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
         return
 
-    circles = getArrows(fileIn, numCircles, numArrows) #generates arrows and returns the array of circles
+    circles = getArrows(fileIn, outputFile, numCircles, numArrows) #generates arrows and returns the array of circles
 
     if circles == None: #in case something went wrong
         return
-
-    for pos in range(0, len(circles)): #outputs the current setup
-        print(str(pos + 1) + " is pointing to => " + "".join(map(convertFromArray, circles[pos].getArrows())))
-        outputFile.write(str(pos + 1) + " is pointing to => " + "".join(map(convertFromArray, circles[pos].getArrows())) + "\n")
 
     playTheGame(circles, numCircles, numArrows, outputFile)
 
