@@ -401,13 +401,12 @@ def main():
         avgNumChecksSingleCircle = avgNumChecksSingleCircle + gamePerCircleAverage
 
         if maxNumTotalChecks < gameTotal:
-            print("Trying to set max total to " + str(gameTotal))
-            maxNumCircleChecks = gameTotal
+            maxNumTotalChecks = gameTotal
         if minNumTotalChecks > gameTotal:
             minNumTotalChecks = gameTotal
 
         if minNumCircleChecks > gameMin:
-            minNumTotalChecks = gameMin
+            minNumCircleChecks = gameMin
         if maxNumCircleChecks < gameMax:
             maxNumCircleChecks = gameMax
 
