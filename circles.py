@@ -78,6 +78,7 @@ import sys
 import math
 
 NUMGAMES = 10
+MAXCHECKS = 1000000
 
 """
 # Class: Circle
@@ -265,6 +266,7 @@ def playTheGame(circles, numCircles, numArrows, outputFile):
     currentCircle = 0 #start at circle #1
     circles[currentCircle].setVisited() #set the starting node as visited
     allNodesHit = False
+    checks = 0
 
     #print("Beginning graph traversal")
     while allNodesHit != True: #while nodes are still unvisited
@@ -275,12 +277,18 @@ def playTheGame(circles, numCircles, numArrows, outputFile):
         
         currentCircle = newVisitingCircle
         circles[currentCircle].setVisited()
+        checks = checks + 1
         allNodesHit = True
 
         for circle in circles: #for each circle, check if the visited count is 0. If yes, then we havent visited it!
             if circle.checkedCount == 0:
                 allNodesHit = False
                 break #since there is a unvisited node, we don't care about the rest. We're looping again anyways
+
+        if(checks >= MAXCHECKS - 1):
+            print("\nGame terminated: Exceeded max number of checks")
+            outputFile.write("\n\nGame terminated: Exceeded max number of checks")
+            sys.exit()
 
     return outputResults(circles, numCircles, numArrows, outputFile)
     
@@ -324,6 +332,27 @@ def outputResults(circles, numCircles, numArrows, outputFile):
 
     return [totalChecks, minChecks, maxChecks, float(totalChecks) / float(numCircles)]
 
+def finalWriteAndClose(outputFile, fileIn, avgNumTotalChecks, avgNumChecksSingleCircle,
+     maxNumTotalChecks, minNumTotalChecks, maxNumCircleChecks, minNumCircleChecks):
+    outputFile.write("\nAverage number of total checks in a game is: " + str(avgNumTotalChecks))
+    outputFile.write("\nAverage number of single circle checks in a game is: " + str(avgNumChecksSingleCircle))
+    print("Average number of total checks in a game is: " + str(avgNumTotalChecks))
+    print("Average number of single circle checks in a game is: " + str(avgNumChecksSingleCircle))
+
+    outputFile.write("\nMax number of checks total in any game is: " + str(maxNumTotalChecks))
+    outputFile.write("\nMin number of checks total in any game is: " + str(minNumTotalChecks))
+    print("Max number of checks total in any game is: " + str(maxNumTotalChecks))
+    print("Min number of checks total in any game is: " + str(minNumTotalChecks))
+
+    outputFile.write("\nMax number of single circle checks in any game is: " + str(maxNumCircleChecks))
+    outputFile.write("\nMin number of single circle checks in any game is: " + str(minNumCircleChecks))
+    print("Max number of single circle checks in any game is: " + str(maxNumCircleChecks))
+    print("Min number of single circle checks in any game is: " + str(minNumCircleChecks))
+
+    outputFile.flush()
+    outputFile.close()
+    fileIn.flush()
+    fileIn.close()
 
 """
 # Function: main
@@ -345,7 +374,6 @@ def main():
     minNumCircleChecks = 2147483647
 
     for rounds in range(0, NUMGAMES):
-
         try: #attempts to open the output and input files in that order. In case input fails, we want to have output open
             if outputFile == None:
                 outputFile = open("HW2OnufriyevOutfile.txt", "w") 
@@ -414,25 +442,8 @@ def main():
     avgNumTotalChecks = avgNumTotalChecks / NUMGAMES
     avgNumChecksSingleCircle = avgNumChecksSingleCircle / NUMGAMES
 
-    outputFile.write("\nAverage number of total checks in a game is: " + str(avgNumTotalChecks))
-    outputFile.write("\nAverage number of single circle checks in a game is: " + str(avgNumChecksSingleCircle))
-    print("Average number of total checks in a game is: " + str(avgNumTotalChecks))
-    print("Average number of single circle checks in a game is: " + str(avgNumChecksSingleCircle))
-
-    outputFile.write("\nMax number of checks total in any game is: " + str(maxNumTotalChecks))
-    outputFile.write("\nMin number of checks total in any game is: " + str(minNumTotalChecks))
-    print("Max number of checks total in any game is: " + str(maxNumTotalChecks))
-    print("Min number of checks total in any game is: " + str(minNumTotalChecks))
-
-    outputFile.write("\nMax number of single circle checks in any game is: " + str(maxNumCircleChecks))
-    outputFile.write("\nMin number of single circle checks in any game is: " + str(minNumCircleChecks))
-    print("Max number of single circle checks in any game is: " + str(maxNumCircleChecks))
-    print("Min number of single circle checks in any game is: " + str(minNumCircleChecks))
-
-    outputFile.flush()
-    outputFile.close()
-    fileIn.flush()
-    fileIn.close()
+    finalWriteAndClose(outputFile, fileIn, avgNumTotalChecks, avgNumChecksSingleCircle, 
+        maxNumTotalChecks, minNumTotalChecks, maxNumCircleChecks, minNumCircleChecks)
 
 
 if __name__ == "__main__":
