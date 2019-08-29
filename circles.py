@@ -1,9 +1,9 @@
 """ 
 # Author: Vasyl Onufriyev
-# Project: Homework 1
-# Purpose: Implement circles and arrows game
-# Started: 8.20.19
-# Completed: 8.20.19
+# Project: Homework 2
+# Purpose: Implement circles and arrows game w/ additional connectivity checks
+# Started: 8.27.19
+# Completed: 8.28.19
 
 * Game Rules *
 
@@ -28,11 +28,8 @@
     5 3
 
     ** Assumptions **
-    The number of arrows is equal to n where n is the number of circles,
+    The number of arrows is equal/greaterthan to n where n is the number of circles,
     or in other words the number on the first line of the input file.
-
-    It is assumed that data that will be provided will be a strongly connected graph
-    and a circuit can be completed on the graph.
 
     Circles are numbered from 1 to n
 
@@ -43,6 +40,7 @@
         graph and proceed to any connected
     3.  Move the "current marker" location to the newly traversed node
     4.  Repeat steps 2 & 3 until all nodes in the graph have been visited
+    5.  Repeat steps 1-4 until NUMGAMES games are completed
 
 * Program Structure Explained *
     ** Possible Bugs **
@@ -63,7 +61,10 @@
     The output file of this program is called HW2OnufriyevOutfile.txt and will contain the 
     top several lines of the input file, I.E the number of circles and arrows in play within
     the game and analytical data such as the total number of circles visited, average number 
-    of checks in a circle throughout the game, and the max number of checks 
+    of checks in a circle throughout the game, and the max number of checks for each game played.
+
+    In addition, there is also mins/maxes/averages of NUMGAMES games at the very bottom. These values
+    are calcualted using the results of the NUMGAMES games. 
 
     ** Assumtions For Calculations **
     I assume that the circle that you begin the game on should be included for the calculations
@@ -407,8 +408,8 @@ def main():
             outputFile.write("Something is wrong with the input...please check and try again.")
             return
 
-        print("Number of circles read: " + str(numCircles))
-        print("Number of arrows read: " + str(numArrows))
+        #print("Number of circles read: " + str(numCircles))
+        #print("Number of arrows read: " + str(numArrows))
 
         if numCircles < 2 or numCircles > 20 or type(numCircles) != int: #cant play if circle count is 0
             print("You must have at 2 circles and a max of 10.")
