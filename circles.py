@@ -60,7 +60,7 @@
     The input file for this project is Hw1infile.txt, the details of what should be in that 
     file are explained above.
 
-    The output file of this program is called HW1OnufriyevOutfile.txt and will contain the 
+    The output file of this program is called HW2OnufriyevOutfile.txt and will contain the 
     top several lines of the input file, I.E the number of circles and arrows in play within
     the game and analytical data such as the total number of circles visited, average number 
     of checks in a circle throughout the game, and the max number of checks 
@@ -77,6 +77,7 @@ import secrets
 import sys
 import math
 
+NUMGAMES = 10
 
 """
 # Class: Circle
@@ -261,16 +262,16 @@ def clearFlags(circles):
 
 
 def playTheGame(circles, numCircles, numArrows, outputFile):
-    currentCircle = 0; #start at circle #1
+    currentCircle = 0 #start at circle #1
     circles[currentCircle].setVisited() #set the starting node as visited
     allNodesHit = False
 
-    print("Beginning graph traversal")
+    #print("Beginning graph traversal")
     while allNodesHit != True: #while nodes are still unvisited
         newVisitingCircle = circles[currentCircle].getRandomArrow()
         
-        print("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1))
-        outputFile.write("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1) + "\n")
+        #print("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1))
+        #outputFile.write("Traversing " + str(currentCircle + 1) + " => " + str(newVisitingCircle + 1) + "\n")
         
         currentCircle = newVisitingCircle
         circles[currentCircle].setVisited()
@@ -281,7 +282,8 @@ def playTheGame(circles, numCircles, numArrows, outputFile):
                 allNodesHit = False
                 break #since there is a unvisited node, we don't care about the rest. We're looping again anyways
 
-    outputResults(circles, numCircles, numArrows, outputFile)
+    return outputResults(circles, numCircles, numArrows, outputFile)
+    
 
 
 """
@@ -301,21 +303,26 @@ def outputResults(circles, numCircles, numArrows, outputFile):
 
     totalChecks = 0
     maxChecks = 0
+    minChecks = 2147483647
 
     for circle in circles: #for each circle in the circle array
         totalChecks += circle.getCheckCount() #add this circle's hitcount to the total
         if circle.getCheckCount() > maxChecks: #if this circle has more hits than the last max
             maxChecks = circle.getCheckCount() #this is now the new max
+        if circle.getCheckCount() < minChecks: #if this circle has less hits than the last min
+            minChecks = circle.getCheckCount() #this is now the new min
 
     #file output
     outputFile.write("\nTotal number of circles visited is: " + str(totalChecks))
     outputFile.write("\nAverage number of circle hits: " + str(float(totalChecks) / float(numCircles))) #total checks divided by total circles = #checks/circles avg
-    outputFile.write("\nMax number of circle hits: " + str(maxChecks))
+    outputFile.write("\nMax number of circle hits: " + str(maxChecks) + "\n\n")
 
     #console output
     print("Total number of circles visited is: " + str(totalChecks))
     print("Average number of circle hits: " + str(float(totalChecks) / float(numCircles)))
-    print("Max number of circle hits: " + str(maxChecks))
+    print("Max number of circle hits: " + str(maxChecks) + "\n")
+
+    return [totalChecks, minChecks, maxChecks, float(totalChecks) / float(numCircles)]
 
 
 """
@@ -329,47 +336,104 @@ def outputResults(circles, numCircles, numArrows, outputFile):
 def main():
     outputFile = None
     fileIn = None
-    try: #attempts to open the output and input files in that order. In case input fails, we want to have output open
-        outputFile = open("HW1OnufriyevOutfile.txt", "w")
-        fileIn = open("HW1infile.txt")
-    except Exception as e:
-        print("There was a problem loading a file => " + str(e))
-        outputFile.write("There was a problem loading a file => " + str(e))
-        return
 
-    try:
-        numCircles = int(fileIn.readline()) #typecasting can fail in the case that a letter or array is input
-        numArrows = int(fileIn.readline())
-    except:
-        print("Something is wrong with the input...please check and try again.")
-        outputFile.write("Something is wrong with the input...please check and try again.")
-        return
+    avgNumTotalChecks = 0.00
+    maxNumTotalChecks = 0
+    minNumTotalChecks = 2147483647
+    avgNumChecksSingleCircle = 0.00
+    maxNumCircleChecks = 0
+    minNumCircleChecks = 2147483647
 
-    print("Number of circles read: " + str(numCircles))
-    print("Number of arrows read: " + str(numArrows))
+    for rounds in range(0, NUMGAMES):
 
-    if numCircles < 2 or numCircles > 10 or type(numCircles) != int: #cant play if circle count is 0
-        print("You must have at 2 circles and a max of 10.")
-        outputFile.write("You must have at 2 circles and a max of 10.")
-        return
+        try: #attempts to open the output and input files in that order. In case input fails, we want to have output open
+            if outputFile == None:
+                outputFile = open("HW2OnufriyevOutfile.txt", "w") 
+            if fileIn == None:
+                fileIn = open("HW1infile.txt")
+            else:
+                fileIn.seek(0)
+        except Exception as e:
+            print("There was a problem loading a file => " + str(e))
+            outputFile.write("There was a problem loading a file => " + str(e))
+            return
 
-    if numArrows < numCircles or type(numCircles) != int: #n is the minimum number of arrows to play and be valid
-        print("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
-        outputFile.write("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
-        return
+        try:
+            numCircles = int(fileIn.readline()) #typecasting can fail in the case that a letter or array is input
+            numArrows = int(fileIn.readline())
+        except:
+            print("Something is wrong with the input...please check and try again.")
+            outputFile.write("Something is wrong with the input...please check and try again.")
+            return
 
-    circles = getArrows(fileIn, outputFile, numCircles, numArrows) #generates arrows and returns the array of circles
+        print("Number of circles read: " + str(numCircles))
+        print("Number of arrows read: " + str(numArrows))
 
-    if circles == None: #in case something went wrong
-        return
+        if numCircles < 2 or numCircles > 20 or type(numCircles) != int: #cant play if circle count is 0
+            print("You must have at 2 circles and a max of 10.")
+            outputFile.write("You must have at 2 circles and a max of 10.")
+            return
 
-    sys.setrecursionlimit(2147483647) #sets recusion limit so python doesn't bork itself
-    if verifyConnectivity(circles) != 1:
-        print("Not a connected graph! Please check your input and try again.")
-        outputFile.write("Not a connected graph! Please check your input and try again.")
-        return
+        if numArrows < numCircles or type(numCircles) != int: #n is the minimum number of arrows to play and be valid
+            print("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
+            outputFile.write("The number of arrow specified do not meet the bare-minimum requirements for a strongly connected graph.")
+            return
 
-    playTheGame(circles, numCircles, numArrows, outputFile)
+
+        circles = getArrows(fileIn, outputFile, numCircles, numArrows) #generates arrows and returns the array of circles
+
+        if circles == None: #in case something went wrong
+            return
+
+        sys.setrecursionlimit(2147483647) #sets recusion limit so python doesn't bork itself during path checks with large circle count
+        if verifyConnectivity(circles) != 1:
+            print("Not a connected graph! Please check your input and try again.")
+            outputFile.write("Not a connected graph! Please check your input and try again.")
+            return
+
+        gameResults = playTheGame(circles, numCircles, numArrows, outputFile) #total, min, max, circ avg result for game stored in set
+        gameTotal = gameResults[0]
+        gameMin = gameResults[1]
+        gameMax = gameResults[2]
+        gamePerCircleAverage = gameResults[3]
+
+        avgNumTotalChecks = avgNumTotalChecks + gameTotal
+        avgNumChecksSingleCircle = avgNumChecksSingleCircle + gamePerCircleAverage
+
+        if maxNumTotalChecks < gameTotal:
+            print("Trying to set max total to " + str(gameTotal))
+            maxNumCircleChecks = gameTotal
+        if minNumTotalChecks > gameTotal:
+            minNumTotalChecks = gameTotal
+
+        if minNumCircleChecks > gameMin:
+            minNumTotalChecks = gameMin
+        if maxNumCircleChecks < gameMax:
+            maxNumCircleChecks = gameMax
+
+
+    avgNumTotalChecks = avgNumTotalChecks / NUMGAMES
+    avgNumChecksSingleCircle = avgNumChecksSingleCircle / NUMGAMES
+
+    outputFile.write("\nAverage number of total checks in a game is: " + str(avgNumTotalChecks))
+    outputFile.write("\nAverage number of single circle checks in a game is: " + str(avgNumChecksSingleCircle))
+    print("Average number of total checks in a game is: " + str(avgNumTotalChecks))
+    print("Average number of single circle checks in a game is: " + str(avgNumChecksSingleCircle))
+
+    outputFile.write("\nMax number of checks total in any game is: " + str(maxNumTotalChecks))
+    outputFile.write("\nMin number of checks total in any game is: " + str(minNumTotalChecks))
+    print("Max number of checks total in any game is: " + str(maxNumTotalChecks))
+    print("Min number of checks total in any game is: " + str(minNumTotalChecks))
+
+    outputFile.write("\nMax number of single circle checks in any game is: " + str(maxNumCircleChecks))
+    outputFile.write("\nMin number of single circle checks in any game is: " + str(minNumCircleChecks))
+    print("Max number of single circle checks in any game is: " + str(maxNumCircleChecks))
+    print("Min number of single circle checks in any game is: " + str(minNumCircleChecks))
+
+    outputFile.flush()
+    outputFile.close()
+    fileIn.flush()
+    fileIn.close()
 
 
 if __name__ == "__main__":
